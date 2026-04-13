@@ -1,0 +1,8 @@
+/ {
+    aliases {
+        // led0 is alias to green_led nodelabel on
+        // my board so I am aliasing to green_led
+        // instead of led0
+        app-led = &green_led;
+    };
+};
