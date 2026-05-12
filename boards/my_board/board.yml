@@ -1,0 +1,6 @@
+board:
+  name: my_board
+  full_name: My Board
+  vendor: bebelno
+  socs:
+    - name: stm32f746xx
