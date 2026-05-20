@@ -1,8 +1,6 @@
 / {
-    aliases {
-        // led0 is alias to green_led nodelabel on
-        // my board so I am aliasing to green_led
-        // instead of led0
-        app-led = &green_led;
+    our_driver0: our_driver {
+        compatible = "our,driver";
+        status = "okay";
     };
 };
