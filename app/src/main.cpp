@@ -1,6 +1,7 @@
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <our_driver_extension.h>
 
 LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
@@ -9,6 +10,8 @@ static const struct device *our_driver = DEVICE_DT_GET(DT_NODELABEL(our_driver0)
 int main(void)
 {
     struct sensor_value val;
+
+    modify_device_instance(our_driver, 67);
 
     while (true) {
         LOG_INF("LED ON");
