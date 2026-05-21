@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#define OUR_DRIVER_CALLIBRATION_DEFAULT 2137
+#define OUR_DRIVER_CALIBRATION_DEFAULT 2137
 
 int modify_device_instance(const struct device *dev, uint32_t new_value);
 

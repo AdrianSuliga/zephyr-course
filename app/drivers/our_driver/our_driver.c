@@ -10,7 +10,7 @@ LOG_MODULE_REGISTER(OurDriver, LOG_LEVEL_DBG);
 
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_NODELABEL(green_led), gpios);
 
-static uint32_t callibration_value = OUR_DRIVER_CALLIBRATION_DEFAULT;
+static uint32_t calibration_value = OUR_DRIVER_CALIBRATION_DEFAULT;
 
 int our_sensor_sample_fetch(const struct device *dev,
 				            enum sensor_channel chan)
@@ -53,4 +53,4 @@ static int init(const struct device *dev)
     return gpio_pin_configure_dt(&led, GPIO_OUTPUT_INACTIVE);
 }
 
-DEVICE_DT_INST_DEFINE(0, init, NULL, (void*)&callibration_value, NULL, POST_KERNEL, 80, &api_our_driver);
+DEVICE_DT_INST_DEFINE(0, init, NULL, (void*)&calibration_value, NULL, POST_KERNEL, 80, &api_our_driver);
