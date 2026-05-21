@@ -1,9 +1,16 @@
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/logging/log.h>
+
+#include "our_driver_extension.h"
+
+LOG_MODULE_REGISTER(OurDriver, LOG_LEVEL_DBG);
 
 #define DT_DRV_COMPAT our_driver
 
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_NODELABEL(green_led), gpios);
+
+static uint32_t callibration_value = OUR_DRIVER_CALLIBRATION_DEFAULT;
 
 int our_sensor_sample_fetch(const struct device *dev,
 				            enum sensor_channel chan)
@@ -25,6 +32,18 @@ static DEVICE_API(sensor, api_our_driver) = {
     .channel_get = our_sensor_channel_get,
 };
 
+int modify_device_instance(const struct device *dev, uint32_t new_value)
+{
+    LOG_INF("Callibration value for %s chagned from %u to %u",
+            dev->name,
+            *((uint32_t*)dev->data),
+            new_value);
+    
+    *((uint32_t*)dev->data) = new_value;
+    
+    return 0;
+}
+
 static int init(const struct device *dev)
 {
     if (!gpio_is_ready_dt(&led)) {
@@ -34,4 +53,4 @@ static int init(const struct device *dev)
     return gpio_pin_configure_dt(&led, GPIO_OUTPUT_INACTIVE);
 }
 
-DEVICE_DT_INST_DEFINE(0, init, NULL, NULL, NULL, POST_KERNEL, 80, &api_our_driver);
+DEVICE_DT_INST_DEFINE(0, init, NULL, (void*)&callibration_value, NULL, POST_KERNEL, 80, &api_our_driver);
