@@ -8,7 +8,7 @@ LOG_MODULE_REGISTER(OurDriver, LOG_LEVEL_DBG);
 
 #define DT_DRV_COMPAT our_driver
 
-static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_NODELABEL(green_led), gpios);
+static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
 
 static uint32_t calibration_value = OUR_DRIVER_CALIBRATION_DEFAULT;
 
