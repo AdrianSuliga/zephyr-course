@@ -47,7 +47,12 @@ ZTEST(ring_buf_init, test_reinit_clears_state)
 	 * verify the buffer is empty and count is 0.
 	 * See TEST_SPEC.md "Suite ring_buf_init" #2.
 	 */
-	ztest_test_skip();
+	zassert_ok(rb_push(99), "Pushing to empty buffer must succeed");
+
+	zassert_ok(rb_init(4), "Reinit must succeed");
+
+	zassert_true(rb_is_empty(), "Buffer after reinit must be empty");
+	zassert_equal(rb_count(), 0, "Buffer count after reinit must be 0");
 }
 
 /*
@@ -64,7 +69,14 @@ ZTEST(ring_buf_push_pop, test_single_push_pop)
 	/* TODO(l8-task1): rb_push(42), rb_pop(&v) -> v == 42, buffer empty after.
 	 * See TEST_SPEC.md "Suite ring_buf_push_pop" #1.
 	 */
-	ztest_test_skip();
+	int v;
+
+	zassert_ok(rb_push(42), "Pushing one value to empty buffer must succeed");
+
+	zassert_ok(rb_pop(&v), "Poping one value from single-element buffer must succeed");
+	zassert_equal(v, 42, "Value pushed and popped from buffer must be the same");
+
+	zassert_true(rb_is_empty(), "Buffer must be empty after popping last element");
 }
 
 ZTEST(ring_buf_push_pop, test_fifo_order)
@@ -73,7 +85,22 @@ ZTEST(ring_buf_push_pop, test_fifo_order)
 	 * and verify the values come out as 1, 2, 3 in that order.
 	 * See TEST_SPEC.md "Suite ring_buf_push_pop" #2.
 	 */
-	ztest_test_skip();
+	int v;
+
+	zassert_ok(rb_push(1), "Pushing when buffer has capacity must succeed");
+	zassert_ok(rb_push(2), "Pushing when buffer has capacity must succeed");
+	zassert_ok(rb_push(3), "Pushing when buffer has capacity must succeed");
+
+	zassert_ok(rb_pop(&v), "Popping from buffer containing elements must succeed");
+	zassert_equal(v, 1, "Buffer must pop 1 as first element");
+
+	zassert_ok(rb_pop(&v), "Popping from buffer containing elements must succeed");
+	zassert_equal(v, 2, "Buffer must pop 2 as second element");
+
+	zassert_ok(rb_pop(&v), "Popping from buffer containing elements must succeed");
+	zassert_equal(v, 3, "Buffer must pop 3 as third element");
+
+	zassert_true(rb_is_empty(), "Buffer must be empty after popping last element");
 }
 
 ZTEST(ring_buf_push_pop, test_push_full_returns_enospc)
@@ -82,7 +109,15 @@ ZTEST(ring_buf_push_pop, test_push_full_returns_enospc)
 	 * one more value -> -ENOSPC.
 	 * See TEST_SPEC.md "Suite ring_buf_push_pop" #3.
 	 */
-	ztest_test_skip();
+	zassert_ok(rb_push(1), "Pushing when buffer has capacity must succeed");
+	zassert_ok(rb_push(2), "Pushing when buffer has capacity must succeed");
+	zassert_ok(rb_push(3), "Pushing when buffer has capacity must succeed");
+	zassert_ok(rb_push(4), "Pushing when buffer has capacity must succeed");
+
+	zassert_true(rb_is_full(), "Buffer must be full after its capacity was all used");
+
+	zassert_equal(rb_push(99), -ENOSPC, "Pushing when buffer is filled must return -ENOSPC");
+	zassert_equal(rb_count(), 4, "Failed push cannot modify buffer state");
 }
 
 /*
@@ -100,7 +135,17 @@ ZTEST(ring_buf_boundaries, test_peek_does_not_consume)
 	 * -> v == 7; rb_count() still == 1.
 	 * See TEST_SPEC.md "Suite ring_buf_boundaries" #1.
 	 */
-	ztest_test_skip();
+	int v;
+	
+	zassert_ok(rb_push(7), "Pushing when buffer has capacity must succeed");
+
+	zassert_ok(rb_peek(&v), "Peeking on buffer must succeed");
+	zassert_equal(v, 7, "Value read must be the same as value pushed");
+
+	zassert_ok(rb_peek(&v), "Peeking on buffer must succeed");
+	zassert_equal(v, 7, "Value read must be the same as value pushed");
+
+	zassert_equal(rb_count(), 1, "Peek cannot modify buffer");
 }
 
 ZTEST(ring_buf_boundaries, test_pop_null_returns_einval)
@@ -108,7 +153,7 @@ ZTEST(ring_buf_boundaries, test_pop_null_returns_einval)
 	/* TODO(l8-task1): rb_pop(NULL) -> -EINVAL.
 	 * See TEST_SPEC.md "Suite ring_buf_boundaries" #2.
 	 */
-	ztest_test_skip();
+	zassert_equal(rb_pop(NULL), -EINVAL, "Passing NULL to rb_pop must return -EINVAL");
 }
 
 ZTEST(ring_buf_boundaries, test_is_full_after_fill)
@@ -116,5 +161,11 @@ ZTEST(ring_buf_boundaries, test_is_full_after_fill)
 	/* TODO(l8-task1): push 4 values -> rb_is_full() == true, rb_count() == 4.
 	 * See TEST_SPEC.md "Suite ring_buf_boundaries" #3.
 	 */
-	ztest_test_skip();
+	zassert_ok(rb_push(1), "Pushing when buffer has capacity must succeed");
+	zassert_ok(rb_push(2), "Pushing when buffer has capacity must succeed");
+	zassert_ok(rb_push(3), "Pushing when buffer has capacity must succeed");
+	zassert_ok(rb_push(4), "Pushing when buffer has capacity must succeed");
+
+	zassert_true(rb_is_full(), "Pushing 4 elements must reach buffer capacity");
+	zassert_equal(rb_count(), 4, "Pushing 4 values must result in count of 4");
 }
